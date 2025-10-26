@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>Painel</title>
+
+  <style>
+
+    *{margin:0;padding:0;box-sizing:border-box;font-family:"Poppins",sans-serif}
+
+    body{
+
+      background:radial-gradient(circle at top,#6a0dad,#2d0055);
+
+      color:#fff;
+
+      min-height:100vh;
+
+      display:flex;
+
+      align-items:center;
+
+      justify-content:center;
+
+    }
+
+    /* painel principal (mantido igual) */
+
+    .painel{
+
+      width:350px;
+
+      background:linear-gradient(180deg,#3e0b72,#220042);
+
+      border-radius:16px;
+
+      box-shadow:0 0 25px rgba(155,75,255,0.4);
+
+      padding:18px;
+
+      position:relative;
+
+    }
+
+    .abas{display:flex;justify-content:space-between;margin-bottom:14px;gap:8px;}
+
+    .aba{flex:1;text-align:center;padding:8px 0;font-weight:600;border-radius:8px;cursor:pointer;background:#2a0047;color:#bfb2d9;transition:.3s;user-select:none}
+
+    .aba.ativa{background:#000;color:#fff}
+
+    .tab-content{display:none}
+
+    .tab-content.ativa{display:block}
+
+    .opcao{display:flex;align-items:center;justify-content:space-between;margin:8px 0}
+
+    .opcao label{font-size:14px}
+
+    input[type="checkbox"]{width:18px;height:18px;accent-color:#9b4bff;cursor:pointer}
+
+    .slider-container{margin-top:10px}
+
+    .slider-container label{display:block;font-size:14px;margin-bottom:5px}
+
+    input[type="range"]{width:100%;accent-color:#9b4bff;-webkit-appearance:none;height:6px;background:rgba(255,255,255,0.06);border-radius:6px;outline:none}
+
+    input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#9b4bff;box-shadow:0 0 6px rgba(155,75,255,0.6);cursor:pointer;border:2px solid rgba(255,255,255,0.06)}
+
+    .select-container{margin-top:10px}
+
+    select{width:100%;background:#1c0033;color:#fff;border:1px solid #6b2cff;border-radius:8px;padding:6px 10px;font-weight:600;font-size:13px;appearance:none}
+
+    .tipo{margin-top:15px;text-align:center;font-size:13px;color:#ccc}
+
+    .botoes{display:flex;justify-content:center;gap:25px;margin-top:8px}
+
+    .radio-btn{background:#000;border-radius:8px;padding:6px 14px;font-weight:600;cursor:pointer;transition:.2s}
+
+    .radio-btn:hover{background:#6b2cff}
+
+    .btn-inject{margin-top:20px;width:100%;background:linear-gradient(90deg,#6b2cff,#9b4bff);border:none;color:#fff;font-weight:700;font-size:15px;padding:10px;border-radius:10px;cursor:pointer;box-shadow:0 0 15px rgba(155,75,255,0.5);transition:.2s}
+
+    .btn-inject:active{transform:scale(.97);box-shadow:0 0 5px rgba(155,75,255,0.6)}
+
+    .value-inline{float:right;font-weight:700;color:#fff;font-size:13px}
+
+    /* toast (injetado com sucesso) */
+
+    .toast{display:none;position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1c0033;color:#00ff7f;padding:10px 20px;border-radius:10px;font-weight:600;box-shadow:0 0 10px rgba(0,255,127,0.5);animation:fade 2s ease-in-out;z-index:999}
+
+    @keyframes fade{0%{opacity:0;transform:translate(-50%,20px)}10%,90%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,20px)}}
+
+    /* Overlay de login (tela inicial) - cor combinando com painel */
+
+    .overlay{
+
+      position:fixed;
+
+      inset:0;
+
+      background:radial-gradient(circle at top left, rgba(106,13,173,0.95), rgba(45,0,85,0.95));
+
+      display:flex;
+
+      align-items:center;
+
+      justify-content:center;
+
+      z-index:1000;
+
+      padding:20px;
+
+    }
+
+    .login-card{
+
+      width:360px;
+
+      max-width:92%;
+
+      background:linear-gradient(180deg, rgba(60,10,85,0.95), rgba(30,0,50,0.95));
+
+      border-radius:14px;
+
+      padding:20px;
+
+      box-shadow:0 10px 40px rgba(0,0,0,0.6);
+
+      text-align:center;
+
+      border:1px solid rgba(155,75,255,0.15);
+
+    }
+
+    .login-card h2{color:#fff;margin-bottom:12px;font-size:18px;letter-spacing:0.4px}
+
+    .login-card p{color:#d3bff9;margin-bottom:10px;font-size:13px}
+
+    .login-input{
+
+      width:100%;
+
+      padding:12px 14px;
+
+      border-radius:8px;
+
+      border:1px solid rgba(255,255,255,0.06);
+
+      background:rgba(0,0,0,0.25);
+
+      color:#fff;
+
+      outline:none;
+
+      font-weight:600;
+
+      margin-bottom:12px;
+
+    }
+
+    .login-btn{
+
+      width:100%;
+
+      padding:12px 14px;
+
+      border-radius:8px;
+
+      background:linear-gradient(90deg,#6b2cff,#9b4bff);
+
+      color:#fff;
+
+      border:none;
+
+      cursor:pointer;
+
+      font-weight:700;
+
+      box-shadow:0 6px 18px rgba(155,75,255,0.25);
+
+      transition:.18s;
+
+    }
+
+    .login-btn:active{transform:scale(.99)}
+
+    .login-error{color:#ff9ea0;font-size:13px;margin-top:10px;min-height:18px}
+
+    .login-small{font-size:12px;color:#bfa3ff;margin-top:8px}
+
+    @media (max-width:420px){ .login-card{padding:16px} .login-card h2{font-size:16px} }
+
+  </style>
+
+</head>
+
+<body>
+
+  <!-- Overlay de login -->
+
+  <div id="loginOverlay" class="overlay" aria-hidden="false">
+
+    <div class="login-card" role="dialog" aria-label="Login">
+
+      <!-- Título alterado conforme pedido -->
+
+      <h2>alves - cheats</h2>
+
+      <p>Digite a senha para acessar o painel</p>
+
+      <input id="loginInput" class="login-input" type="password" placeholder="Senha" autocomplete="off" />
+
+      <button id="loginBtn" class="login-btn">Entrar</button>
+
+      <div id="loginError" class="login-error" aria-live="polite"></div>
+
+      <!-- rodapé removido conforme pedido -->
+
+    </div>
+
+  </div>
+
+  <!-- Painel (conteúdo principal) -->
+
+  <div class="painel" id="mainPanel" style="visibility:hidden;opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s">
+
+    <div class="abas">
+
+      <div class="aba ativa" data-target="auxilios">AUXÍLIOS</div>
+
+      <div class="aba" data-target="config">CONFIG</div>
+
+      <div class="aba" data-target="info">INFO</div>
+
+    </div>
+
+    <!-- AUXILIOS -->
+
+    <div id="auxilios" class="tab-content ativa">
+
+      <div class="opcao"><label>aimneck</label><input type="checkbox" id="aimbot"></div>
+
+      <div class="opcao"><label>norecoil</label><input type="checkbox" id="norecoil"></div>
+
+      <div class="slider-container">
+
+        <label>FOV <span id="aux-fov-value" class="value-inline">50</span></label>
+
+        <input id="aux-fov" type="range" min="0" max="180" value="50">
+
+      </div>
+
+      <div class="select-container">
+
+        <select>
+
+          <option>Auxílio neck</option>
+
+          <option>Auxílio recoil</option>
+
+          <option>Auxílio aimbot</option>
+
+        </select>
+
+      </div>
+
+      <div class="select-container">
+
+        <select>
+
+          <option>Tipo de foco: Cabeça</option>
+
+          <option>Tipo de foco: pescoço</option>
+
+        </select>
+
+      </div>
+
+      <div class="tipo">Tipo de Auxílio</div>
+
+      <div class="botoes">
+
+        <div class="radio-btn" style="background:#6b2cff;">Ao Atirar</div>
+
+        <div class="radio-btn">Ao Mirar</div>
+
+      </div>
+
+      <button class="btn-inject">INJECT</button>
+
+    </div>
+
+    <!-- CONFIG -->
+
+    <div id="config" class="tab-content">
+
+      <div class="opcao"><label>aimlock</label><input type="checkbox" id="cfg-aimprecision"></div>
+
+      <div class="opcao"><label>headtrick</label><input type="checkbox" id="cfg-aimfov"></div>
+
+      <button class="btn-inject" style="margin-top:14px;">INJECT</button>
+
+    </div>
+
+    <!-- INFO -->
+
+    <div id="info" class="tab-content">
+
+      <div style="font-size:13px;color:#d8cfe8;line-height:1.4;">
+
+        Versão: 1.0<br />Desenvolvedor: aimbotbled
+
+      </div> 
+
+    </div> 
+
+  </div>
+ 
+  <!-- toast -->
+
+  <div id="toast" class="toast">✅ Injetado com sucesso</div>
+
+  <script>
+
+    // ====== SENHA DEFINIDA AQUI ======
+
+    const PASSWORD = "Alves-and-aimbotled-cheatsauxilio021";
+
+    // =================================
+
+    // elementos do login
+
+    const loginOverlay = document.getElementById("loginOverlay");
+
+    const loginInput = document.getElementById("loginInput");
+
+    const loginBtn = document.getElementById("loginBtn");
+
+    const loginError = document.getElementById("loginError");
+
+    const mainPanel = document.getElementById("mainPanel");
+
+    // mostrar painel (após login)
+
+    function showMainPanel() {
+
+      loginOverlay.style.display = "none";
+
+      mainPanel.style.visibility = "visible";
+
+      mainPanel.style.opacity = "1";
+
+      mainPanel.style.transform = "translateY(0)";
+
+    }
+
+    // checar senha
+
+    function checkPassword() {
+
+      const v = loginInput.value || "";
+
+      if (v === PASSWORD) {
+
+        loginError.textContent = "";
+
+        // animação de saída (pequena espera para parecer suave)
+
+        loginOverlay.style.transition = "opacity .18s";
+
+        loginOverlay.style.opacity = "0";
+
+        setTimeout(showMainPanel, 160);
+
+      } else {
+
+        loginError.textContent = "Senha incorreta";
+
+        // pequeno efeito visual
+
+        loginOverlay.animate([{ transform: "translateX(0)" }, { transform: "translateX(-8px)" }, { transform: "translateX(8px)" }, { transform: "translateX(0)" }], { duration: 250 });
+
+        loginInput.value = "";
+
+        loginInput.focus();
+
+      }
+
+    }
+
+    loginBtn.addEventListener("click", checkPassword);
+
+    loginInput.addEventListener("keydown", (e) => { if (e.key === "Enter") checkPassword(); });
+
+    // focar input automaticamente
+
+    loginInput.focus();
+
+    // ====== resto do script original (tabs, sliders, toast) ======
+
+    const abas = document.querySelectorAll('.aba');
+
+    const contents = document.querySelectorAll('.tab-content');
+
+    abas.forEach(aba => {
+
+      aba.addEventListener('click', () => {
+
+        abas.forEach(a => a.classList.remove('ativa'));
+
+        aba.classList.add('ativa');
+
+        const target = aba.dataset.target;
+
+        contents.forEach(c => c.classList.remove('ativa'));
+
+        document.getElementById(target).classList.add('ativa');
+
+      });
+
+    });
+
+    // FOV com número
+
+    const auxFov = document.getElementById('aux-fov');
+
+    const auxFovValue = document.getElementById('aux-fov-value');
+
+    if (auxFov && auxFovValue) {
+
+      auxFov.addEventListener('input', () => {
+
+        auxFovValue.textContent = auxFov.value;
+
+      });
+
+    }
+
+    // Mensagem de sucesso (INJECT free fire files)
+
+    const buttons = document.querySelectorAll('.btn-inject');
+
+    const toast = document.getElementById('toast');
+
+    buttons.forEach(btn => {
+
+      btn.addEventListener('click', () => {
+
+        toast.style.display = 'block';
+
+        setTimeout(() => { toast.style.display = 'none'; }, 2000);
+
+      });
+
+    });
+
+  </script>
+
+</body>
+
+</html>
